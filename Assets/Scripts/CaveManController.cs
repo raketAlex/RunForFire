@@ -21,14 +21,20 @@ private void Start() {
   }
   void FollowPath()
   {
-  //  List<Vector3> path = DrawRouteScript.instance.pathNodes;
+    if(currentPos >= DrawRouteScript.instance.pathNodes.Count)
+        {
+            DrawRouteScript.instance.RemoveNodes();
+            GameManager.instance.gameState = GameManager.GameState.drawing;
+        }
+
     transform.LookAt(DrawRouteScript.instance.pathNodes[currentPos],Vector3.up);
     float distBetween = Vector3.Distance(transform.position,DrawRouteScript.instance.pathNodes[currentPos]);
     if(followRadius > distBetween)
     {
         currentPos++;
+        
     }
-    Debug.Log(distBetween);
+    
     transform.position = Vector3.MoveTowards(transform.position,DrawRouteScript.instance.pathNodes[currentPos], moveSpeed * Time.deltaTime);
     
   }

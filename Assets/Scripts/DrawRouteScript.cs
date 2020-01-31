@@ -6,20 +6,17 @@ public class DrawRouteScript : MonoBehaviour
 {
     public static DrawRouteScript instance;
     bool canDraw = true;
-    bool isDrawing = false;
-    int lengthOfLr = 0;
-    bool canUpdate = false;
     [HideInInspector]
     public LineRenderer lr;
     public float maxDistance;
     public float yOffset = 2f;
     public Vector3 currentPos;
     public Vector3 previousPos; 
-    public GameObject car;
     public LayerMask groundLayer;
     public List<Vector3> pathNodes = new List<Vector3>();
     private ParticleSystem drawParty;
-    public float drawDistance;
+    
+    public bool isDrawing = false;
 
     private void Awake() {
         instance=this;
@@ -32,12 +29,13 @@ public class DrawRouteScript : MonoBehaviour
     lr.positionCount = pathNodes.Count;
     }
     private void Update() {
-        if(Input.GetMouseButtonDown(0))
+       
+        if(Input.GetMouseButtonDown(0) && !isDrawing)
         {
            StartDraw();   
 
         } 
-        else if(!canDraw && Input.GetMouseButton(0)){
+        else if(!canDraw && Input.GetMouseButton(0) && isDrawing){
             
             UpdateLine();
         }
@@ -48,16 +46,16 @@ public class DrawRouteScript : MonoBehaviour
         } 
     }
     void StartDraw(){
+
         RaycastHit hit;
         Ray ray = CameraScript.instance.mainCamera.ScreenPointToRay(Input.mousePosition);
         if(Physics.Raycast(ray,out hit, Mathf.Infinity,groundLayer)){
+            isDrawing = true;
             drawParty.transform.position = hit.point;
             currentPos = hit.point;
             pathNodes.Add(currentPos);
-            //pathNodes.Add(currentPos);
             lr.positionCount = pathNodes.Count;
             lr.SetPosition(0, currentPos);
-            //lr.SetPosition(1, currentPos);
             
             previousPos = currentPos;
             currentPos = Vector3.zero;
@@ -74,13 +72,12 @@ public class DrawRouteScript : MonoBehaviour
         
         if(Physics.Raycast(ray,out hit, Mathf.Infinity, groundLayer))
         {
-            Debug.Log(hit.transform.gameObject.layer);
             drawParty.transform.position = hit.point;
             currentPos = hit.point;
             currentPos.y += yOffset;
   
             var distance = Vector3.Distance(previousPos, currentPos);
-           drawDistance += distance;
+          
             if(distance > maxDistance){
                {
                    pathNodes.Add(currentPos);
@@ -98,4 +95,11 @@ public class DrawRouteScript : MonoBehaviour
             } 
         }
     }
+    public void RemoveNodes()
+    {
+        pathNodes.Clear();
+       // lr.positionCount = 0;
+        isDrawing = false;
+    }
+
 }
