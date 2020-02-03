@@ -16,4 +16,9 @@ public class GameManager : MonoBehaviour
         instance = this;
         gameState = GameState.drawing;
     }
+
+    public void SwitchState(GameState state)
+    {
+        gameState = state;
+    }
 }

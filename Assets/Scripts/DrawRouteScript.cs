@@ -25,6 +25,8 @@ public class DrawRouteScript : MonoBehaviour
     lr = GetComponent<LineRenderer>();
     drawParty = GetComponentInChildren<ParticleSystem>();
     lr.enabled = false;
+    drawParty.gameObject.SetActive(false);
+    
     pathNodes.Clear();
     lr.positionCount = pathNodes.Count;
     }
@@ -41,7 +43,7 @@ public class DrawRouteScript : MonoBehaviour
         }
         else if(Input.GetMouseButtonUp(0)){
             canDraw = true;
-            GameManager.instance.gameState = GameManager.GameState.running;
+            GameManager.instance.SwitchState(GameManager.GameState.running);
             
         } 
     }
@@ -52,6 +54,7 @@ public class DrawRouteScript : MonoBehaviour
         if(Physics.Raycast(ray,out hit, Mathf.Infinity,groundLayer)){
             isDrawing = true;
             drawParty.transform.position = hit.point;
+            drawParty.gameObject.SetActive(true);
             currentPos = hit.point;
             pathNodes.Add(currentPos);
             lr.positionCount = pathNodes.Count;
@@ -69,7 +72,7 @@ public class DrawRouteScript : MonoBehaviour
     void UpdateLine(){
         RaycastHit hit;
         Ray ray = CameraScript.instance.mainCamera.ScreenPointToRay(Input.mousePosition);
-        
+        drawParty.gameObject.SetActive(true);
         if(Physics.Raycast(ray,out hit, Mathf.Infinity, groundLayer))
         {
             drawParty.transform.position = hit.point;
@@ -97,8 +100,8 @@ public class DrawRouteScript : MonoBehaviour
     }
     public void RemoveNodes()
     {
+        lr.positionCount = 0;
         pathNodes.Clear();
-       // lr.positionCount = 0;
         isDrawing = false;
     }
 
