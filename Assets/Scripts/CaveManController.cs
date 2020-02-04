@@ -5,18 +5,39 @@ using UnityEngine;
 public class CaveManController : MonoBehaviour
 {
   public Transform direction;
-  //public float moveSpeed = 5f;
+  public static CaveManController instance;
   private float rotateSpeed = 5;
   public float followRadius = 1f;
   public int currentPos;
   public Rigidbody myRb;
-Vector3 movePos;
   Input runButton;
+  Quaternion startRotation;
+  Vector3 startPos;
+  public bool resetPlayer = false;
+  GameObject startRadius;
+  public bool inst = false;
+  public Material startMaterial;
+  Vector3 radiusScale;
+  float radiusSize = 4f;
+  public ParticleSystem crashParticle;
 
-private void Start() {
+  private void Awake() 
+  {
+    instance = this;  
+  }
+  private void Start() 
+  {
     currentPos = 0;
-    //myRb = GetComponent<Rigidbody>();
-}
+    
+    startRotation = myRb.transform.localRotation;
+    startPos = myRb.transform.localPosition;
+
+  }
+
+  private void OnEnable() 
+  {
+    SetupStartRadius(false);
+  }
 
  public float moveSpeed()
    {
@@ -36,10 +57,22 @@ private void Start() {
 
   private void Update() 
   { 
-  if(DrawRouteScript.instance.pathNodes.Count != 0 && GameManager.instance.gameState == GameManager.GameState.running)
+    switch(GameManager.instance.gameState)
     {
+      case GameManager.GameState.running:
       FollowPath();
-    }    
+      break;
+
+      case GameManager.GameState.drawing:
+      if(inst)
+      {
+        SetupStartRadius(false);
+      }
+      break;
+
+      case GameManager.GameState.gameOver:
+      break;
+    }
   }
   void FollowPath()
   {
@@ -48,6 +81,7 @@ private void Start() {
         {
             currentPos = 0;
             DrawRouteScript.instance.RemoveNodes();
+            StartCoroutine(ShowDrawRadius());
             GameManager.instance.SwitchState(GameManager.GameState.drawing);
         }
     
@@ -70,13 +104,98 @@ private void Start() {
   }
 
   void OnTriggerEnter(Collider other) {
-    Debug.Log("works");
-    if(other.gameObject.layer == LayerMask.NameToLayer("Dino"))
+    
+    if(other.gameObject.layer == LayerMask.NameToLayer("Obstacle"))
     {
-      Debug.Log("GIT");
+      RaycastHit hit;
+      if(Physics.Raycast(transform.position, transform.forward, out hit))
+      {
+      var contact = hit.point;
+      var direction = transform.position - contact;
+      var party = Instantiate(crashParticle, contact,Quaternion.identity );
+      party.Emit(80);
+      DrawRouteScript.instance.RemoveNodes();
+      
+      ChildCollision(direction);
       GameManager.instance.SwitchState(GameManager.GameState.drawing);
+      }
     }
   }
+  public void ChildCollision(Vector3 direction)
+  {
+    GameManager.instance.SwitchState(GameManager.GameState.gameOver);
+    myRb.isKinematic = false;
+    myRb.useGravity = true;
+    myRb.constraints = RigidbodyConstraints.None;
+    myRb.AddForce(direction.normalized * moveSpeed(),ForceMode.Impulse);
+    myRb.AddForce(Vector3.up * 2f, ForceMode.Impulse);
+    myRb.AddTorque(Vector3.right * -10f);
+  }
 
-  
+  public void ResetCharacter()
+  {
+    myRb.velocity = Vector3.zero;
+    myRb.isKinematic = true;
+    myRb.useGravity = false;
+    myRb.constraints = RigidbodyConstraints.FreezePositionX;
+    myRb.constraints = RigidbodyConstraints.FreezePositionZ;
+    myRb.transform.localRotation = startRotation;
+    myRb.transform.localPosition = startPos;
+  }
+  public void SetupStartRadius(bool update)
+    {
+      if(!update)
+      {
+        startRadius = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        startRadius.transform.position = CaveManController.instance.transform.position;
+        startRadius.GetComponent<Renderer>().material = startMaterial;        
+        //DestroyImmediate(startRadius.GetComponent<CapsuleCollider>());
+        radiusScale = new Vector3(radiusSize,0.01f,radiusSize);
+        startRadius.transform.localScale = radiusScale;
+        startRadius.layer = LayerMask.NameToLayer("DrawRadius");
+      }
+        
+
+        RaycastHit hit;
+        if(Physics.Raycast(transform.position, Vector3.down, out hit,Mathf.Infinity))
+        {
+          startRadius.transform.position = new Vector3(hit.point.x, hit.point.y , hit.point.z);
+        }
+    }
+
+    public IEnumerator HideDrawRadius()
+    {
+      float elapsed = 0;
+      float duration = .9f;
+      startRadius.GetComponent<Collider>().enabled = false;
+      
+      while(elapsed < duration)
+      {
+
+      float size = RSLerp.EaseInBack(radiusSize, 0.00001f, elapsed, duration);
+      elapsed = Mathf.Min(duration, elapsed + Time.deltaTime);
+      startRadius.transform.localScale = new Vector3(size * 1, 0.0001f, size * 1);// size * Vector3.one;
+      yield return new WaitForEndOfFrame();
+      }
+      startRadius.SetActive(false);
+    }
+    public IEnumerator ShowDrawRadius()
+    {
+      float elapsed = 0;
+      float duration = .5f;
+      SetupStartRadius(true);
+      startRadius.GetComponent<Collider>().enabled = true;
+      startRadius.SetActive(true);
+      while(elapsed < duration)
+      {
+        float size = RSLerp.EaseInCubic(0.00001f, radiusSize, elapsed, duration);
+        elapsed = Mathf.Min(duration, elapsed + Time.deltaTime);
+        startRadius.transform.localScale = new Vector3(1 * size, radiusScale.y, 1 * size);
+        
+        Debug.Log(elapsed);
+        yield return new WaitForEndOfFrame();
+
+      }
+    }
+
 }

@@ -13,6 +13,7 @@ public class DrawRouteScript : MonoBehaviour
     public Vector3 currentPos;
     public Vector3 previousPos; 
     public LayerMask groundLayer;
+    public LayerMask startLayer;
     public List<Vector3> pathNodes = new List<Vector3>();
     private ParticleSystem drawParty;
     
@@ -31,27 +32,48 @@ public class DrawRouteScript : MonoBehaviour
     lr.positionCount = pathNodes.Count;
     }
     private void Update() {
-       
-        if(Input.GetMouseButtonDown(0) && !isDrawing)
-        {
-           StartDraw();   
+       switch (GameManager.instance.gameState)
+       {
+           case GameManager.GameState.drawing:
+            if(Input.GetMouseButtonDown(0) && !isDrawing)
+            {   
+            StartDraw(startLayer);   
 
-        } 
-        else if(!canDraw && Input.GetMouseButton(0) && isDrawing){
+            } 
+            else if(!canDraw && Input.GetMouseButton(0) && isDrawing){
             
             UpdateLine();
-        }
-        else if(Input.GetMouseButtonUp(0)){
+            }
+            else if(Input.GetMouseButtonUp(0)){
             canDraw = true;
             GameManager.instance.SwitchState(GameManager.GameState.running);
             
         } 
+           break;
+           
+           case GameManager.GameState.editPath:
+           if(Input.GetMouseButtonDown(0) && !isDrawing)
+            {   
+            StartDraw(groundLayer);   
+
+            } 
+            else if(!canDraw && Input.GetMouseButton(0) && isDrawing){
+            
+            UpdateLine();
+            }
+            else if(Input.GetMouseButtonUp(0)){
+            canDraw = true;
+            }
+
+           break;
+
+       }
     }
-    void StartDraw(){
+    void StartDraw(LayerMask layer){
 
         RaycastHit hit;
         Ray ray = CameraScript.instance.mainCamera.ScreenPointToRay(Input.mousePosition);
-        if(Physics.Raycast(ray,out hit, Mathf.Infinity,groundLayer)){
+        if(Physics.Raycast(ray,out hit, Mathf.Infinity,layer)){
             isDrawing = true;
             drawParty.transform.position = hit.point;
             drawParty.gameObject.SetActive(true);
@@ -62,12 +84,14 @@ public class DrawRouteScript : MonoBehaviour
             
             previousPos = currentPos;
             currentPos = Vector3.zero;
+            StartCoroutine(CaveManController.instance.HideDrawRadius());
         }
         
         if(canDraw){
             lr.enabled = true;  
             canDraw = false;
         }  
+        
     }
     void UpdateLine(){
         RaycastHit hit;

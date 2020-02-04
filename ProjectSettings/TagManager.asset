@@ -17,8 +17,8 @@ TagManager:
   - Player
   - Ground
   - Dino
-  - 
-  - 
+  - Obstacle
+  - DrawRadius
   - 
   - 
   - 

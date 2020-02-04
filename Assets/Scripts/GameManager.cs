@@ -8,7 +8,9 @@ public class GameManager : MonoBehaviour
     public enum GameState 
     {
         drawing,
-        running
+        running,
+        gameOver, 
+        editPath
     }
     public GameState gameState;
 
@@ -21,4 +23,6 @@ public class GameManager : MonoBehaviour
     {
         gameState = state;
     }
+
+    
 }
