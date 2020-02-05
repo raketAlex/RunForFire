@@ -191,8 +191,6 @@ public class CaveManController : MonoBehaviour
         float size = RSLerp.EaseInCubic(0.00001f, radiusSize, elapsed, duration);
         elapsed = Mathf.Min(duration, elapsed + Time.deltaTime);
         startRadius.transform.localScale = new Vector3(1 * size, radiusScale.y, 1 * size);
-        
-        Debug.Log(elapsed);
         yield return new WaitForEndOfFrame();
 
       }

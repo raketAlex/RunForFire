@@ -13,6 +13,18 @@ public class GameManager : MonoBehaviour
         editPath
     }
     public GameState gameState;
+    public int stoneCount = 0;
+    public int grassCount = 0;
+    public void UpdatePickups(string name)
+    {
+        if(name == "stone")
+        {
+            stoneCount++;
+        } else if(name == "grass")
+        {
+            grassCount++;
+        }
+    }
 
     private void Awake() {
         instance = this;

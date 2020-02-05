@@ -1457,6 +1457,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameState: 0
+  stoneCount: 0
+  grassCount: 0
 --- !u!4 &708734093
 Transform:
   m_ObjectHideFlags: 0
@@ -11170,6 +11172,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 7831041365271220971, guid: 6e199d5abe4ec4f80b2bef82fc07fd47,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 7831041365271220973, guid: 6e199d5abe4ec4f80b2bef82fc07fd47,
         type: 3}
       propertyPath: startMaterial
@@ -11181,10 +11188,20 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8109124333031060853, guid: fc2fa89d5f685435595ffbd10d9339dd,
         type: 3}
+    - target: {fileID: 7831041365672528880, guid: 6e199d5abe4ec4f80b2bef82fc07fd47,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
+      objectReference: {fileID: 0}
     - target: {fileID: 7831041365672528887, guid: 6e199d5abe4ec4f80b2bef82fc07fd47,
         type: 3}
       propertyPath: m_Mass
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7831041366646200785, guid: 6e199d5abe4ec4f80b2bef82fc07fd47,
+        type: 3}
+      propertyPath: m_Layer
+      value: 9
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6e199d5abe4ec4f80b2bef82fc07fd47, type: 3}
