@@ -38,7 +38,7 @@ public class PickupScript : MonoBehaviour
       while(elapsed < duration)
       {
         size = RSLerp.EaseInOutCirc(startSize, 0.0001f,elapsed, duration);
-        pickupObj.localScale = size * Vector3.one;
+        pickupObj.GetComponentInChildren<Transform>().localScale = size * Vector3.one;
         elapsed = Mathf.Min(duration, elapsed + Time.deltaTime);
         yield return new WaitForEndOfFrame();
       } 

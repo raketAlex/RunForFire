@@ -11177,6 +11177,16 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 9
       objectReference: {fileID: 0}
+    - target: {fileID: 7831041365271220972, guid: 6e199d5abe4ec4f80b2bef82fc07fd47,
+        type: 3}
+      propertyPath: m_Radius
+      value: 0.69400215
+      objectReference: {fileID: 0}
+    - target: {fileID: 7831041365271220972, guid: 6e199d5abe4ec4f80b2bef82fc07fd47,
+        type: 3}
+      propertyPath: m_Center.z
+      value: 0.012452126
+      objectReference: {fileID: 0}
     - target: {fileID: 7831041365271220973, guid: 6e199d5abe4ec4f80b2bef82fc07fd47,
         type: 3}
       propertyPath: startMaterial
@@ -11188,6 +11198,11 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8109124333031060853, guid: fc2fa89d5f685435595ffbd10d9339dd,
         type: 3}
+    - target: {fileID: 7831041365271220975, guid: 6e199d5abe4ec4f80b2bef82fc07fd47,
+        type: 3}
+      propertyPath: m_CollisionDetection
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 7831041365672528880, guid: 6e199d5abe4ec4f80b2bef82fc07fd47,
         type: 3}
       propertyPath: m_Layer
