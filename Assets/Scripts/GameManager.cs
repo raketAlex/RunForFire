@@ -13,16 +13,19 @@ public class GameManager : MonoBehaviour
         editPath
     }
     public GameState gameState;
-    public int stoneCount = 0;
-    public int grassCount = 0;
+    public bool hasStone, hasGrass;
+    
+   private void Update() {
+       Debug.Log(CanFinish());
+   }
     public void UpdatePickups(string name)
     {
         if(name == "stone")
         {
-            stoneCount++;
+            hasStone = true;
         } else if(name == "grass")
         {
-            grassCount++;
+            hasGrass = true;
         }
     }
 
@@ -34,6 +37,17 @@ public class GameManager : MonoBehaviour
     public void SwitchState(GameState state)
     {
         gameState = state;
+    }
+    public bool CanFinish()
+    {
+        if(hasGrass && hasStone)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     
