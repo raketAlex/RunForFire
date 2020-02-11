@@ -12,7 +12,7 @@ public class DrawRouteScript : MonoBehaviour
     public float yOffset = 2f;
     public Vector3 currentPos;
     public Vector3 previousPos; 
-    public LayerMask groundLayer;
+    public LayerMask drawLayer;
     public LayerMask startLayer;
     public List<Vector3> pathNodes = new List<Vector3>();
     private ParticleSystem drawParty;
@@ -46,7 +46,8 @@ public class DrawRouteScript : MonoBehaviour
             }
             else if(Input.GetMouseButtonUp(0)){
             canDraw = true;
-            GameManager.instance.SwitchState(GameManager.GameState.running);
+            CameraScript.instance.CameraZooming(true);
+            //GameManager.instance.SwitchState(GameManager.GameState.running);
             
         } 
            break;
@@ -54,7 +55,7 @@ public class DrawRouteScript : MonoBehaviour
            case GameManager.GameState.editPath:
            if(Input.GetMouseButtonDown(0) && !isDrawing)
             {   
-            StartDraw(groundLayer);   
+            StartDraw(drawLayer);   
 
             } 
             else if(!canDraw && Input.GetMouseButton(0) && isDrawing){
@@ -97,7 +98,7 @@ public class DrawRouteScript : MonoBehaviour
         RaycastHit hit;
         Ray ray = CameraScript.instance.mainCamera.ScreenPointToRay(Input.mousePosition);
         drawParty.gameObject.SetActive(true);
-        if(Physics.Raycast(ray,out hit, Mathf.Infinity, groundLayer))
+        if(Physics.Raycast(ray,out hit, Mathf.Infinity, drawLayer))
         {
             drawParty.transform.position = hit.point;
             currentPos = hit.point;

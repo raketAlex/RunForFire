@@ -6,7 +6,7 @@ public class CaveManController : MonoBehaviour
 {
   public Transform direction;
   public static CaveManController instance;
-  private float rotateSpeed = 5;
+  public float rotateSpeed = 5;
   public float followRadius = 1f;
   public int currentPos;
   public Rigidbody myRb;
@@ -15,11 +15,13 @@ public class CaveManController : MonoBehaviour
   Vector3 startPos;
   public bool resetPlayer = false;
   GameObject startRadius;
-  public bool inst = false;
+  public bool canDraw = false;
   public Material startMaterial;
   Vector3 radiusScale;
   float radiusSize = 4f;
   public ParticleSystem crashParticle;
+  public LayerMask groundLayer;
+  
 
   private void Awake() 
   {
@@ -30,13 +32,13 @@ public class CaveManController : MonoBehaviour
     currentPos = 0;
     
     startRotation = myRb.transform.localRotation;
-    startPos = myRb.transform.localPosition;
+    startPos = myRb.transform.position;
 
   }
 
   private void OnEnable() 
   {
-    SetupStartRadius(false);
+    UpdateDrawRadius(false);
   }
 
  public float moveSpeed()
@@ -57,16 +59,26 @@ public class CaveManController : MonoBehaviour
 
   private void Update() 
   { 
+    Debug.Log(IsGrounded());
     switch(GameManager.instance.gameState)
     {
       case GameManager.GameState.running:
+      if(!IsGrounded())
+      {
+        StartCoroutine(Falling());
+      }
       FollowPath();
       break;
 
+      case GameManager.GameState.falling:
+
+      break;
+
       case GameManager.GameState.drawing:
-      if(inst)
+      if(canDraw)
       {
-        SetupStartRadius(false);
+        
+        UpdateDrawRadius(false);
       }
       break;
 
@@ -82,25 +94,32 @@ public class CaveManController : MonoBehaviour
             currentPos = 0;
             DrawRouteScript.instance.RemoveNodes();
             StartCoroutine(ShowDrawRadius());
+            myRb.velocity = Vector3.zero;
+            myRb.angularVelocity = Vector3.zero;
             GameManager.instance.SwitchState(GameManager.GameState.drawing);
         }
     
     if(DrawRouteScript.instance.pathNodes.Count != 0)
     {
-      float distBetween = Vector3.Distance(transform.position,DrawRouteScript.instance.pathNodes[currentPos]);
+      float distBetween = Vector3.Distance(myRb.transform.position,DrawRouteScript.instance.pathNodes[currentPos]);
       if(followRadius > distBetween)
       {
         currentPos++;  
       }
+      myRb.angularVelocity = Vector3.zero;
       PlayerRotation(DrawRouteScript.instance.pathNodes[currentPos]);
-      transform.position = Vector3.MoveTowards(transform.position,DrawRouteScript.instance.pathNodes[currentPos], moveSpeed() * Time.deltaTime);
+      
+      myRb.velocity = myRb.transform.forward * moveSpeed();
+      //myRb.transform.position = Vector3.MoveTowards(myRb.transform.position,DrawRouteScript.instance.pathNodes[currentPos], moveSpeed() * Time.deltaTime);
     }
   }
 
   private void PlayerRotation(Vector3 lookPos)
   {
-    var targetRot = Quaternion.LookRotation(lookPos- transform.position);
-    transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, rotateSpeed * Time.deltaTime);
+    var targetRot = Quaternion.LookRotation(lookPos- myRb.transform.position);
+    targetRot.x = 0;
+    targetRot.z = 0;
+    myRb.transform.rotation = Quaternion.Slerp(myRb.transform.rotation, targetRot, rotateSpeed * Time.deltaTime);
   }
 
   void OnTriggerEnter(Collider other) {
@@ -108,20 +127,20 @@ public class CaveManController : MonoBehaviour
     if(other.gameObject.layer == LayerMask.NameToLayer("Obstacle"))
     {
       RaycastHit hit;
-      if(Physics.Raycast(transform.position, transform.forward, out hit))
+      if(Physics.Raycast(myRb.transform.position, myRb.transform.forward, out hit))
       {
       var contact = hit.point;
-      var direction = transform.position - contact;
+      var direction = myRb.transform.position - contact;
       var party = Instantiate(crashParticle, contact,Quaternion.identity );
       party.Emit(80);
       DrawRouteScript.instance.RemoveNodes();
       
-      ChildCollision(direction);
+      DeathCollision(direction);
       GameManager.instance.SwitchState(GameManager.GameState.drawing);
       }
     }
   }
-  public void ChildCollision(Vector3 direction)
+  public void DeathCollision(Vector3 direction)
   {
     GameManager.instance.SwitchState(GameManager.GameState.gameOver);
     myRb.isKinematic = false;
@@ -142,14 +161,14 @@ public class CaveManController : MonoBehaviour
     myRb.transform.localRotation = startRotation;
     myRb.transform.localPosition = startPos;
   }
-  public void SetupStartRadius(bool update)
+  public void UpdateDrawRadius(bool update)
     {
       if(!update)
       {
         startRadius = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        startRadius.transform.position = CaveManController.instance.transform.position;
+        myRb.transform.position = myRb.position;
         startRadius.GetComponent<Renderer>().material = startMaterial;        
-        //DestroyImmediate(startRadius.GetComponent<CapsuleCollider>());
+        startRadius.GetComponent<Collider>().isTrigger = true;
         radiusScale = new Vector3(radiusSize,0.01f,radiusSize);
         startRadius.transform.localScale = radiusScale;
         startRadius.layer = LayerMask.NameToLayer("DrawRadius");
@@ -157,7 +176,7 @@ public class CaveManController : MonoBehaviour
         
 
         RaycastHit hit;
-        if(Physics.Raycast(transform.position, Vector3.down, out hit,Mathf.Infinity))
+        if(Physics.Raycast(myRb.transform.position, Vector3.down, out hit,Mathf.Infinity))
         {
           startRadius.transform.position = new Vector3(hit.point.x, hit.point.y , hit.point.z);
         }
@@ -183,7 +202,7 @@ public class CaveManController : MonoBehaviour
     {
       float elapsed = 0;
       float duration = .5f;
-      SetupStartRadius(true);
+      UpdateDrawRadius(true);
       startRadius.GetComponent<Collider>().enabled = true;
       startRadius.SetActive(true);
       while(elapsed < duration)
@@ -194,6 +213,27 @@ public class CaveManController : MonoBehaviour
         yield return new WaitForEndOfFrame();
 
       }
+    }
+    public bool IsGrounded()
+    {
+        if(Physics.Raycast(myRb.transform.position, -myRb.transform.up,2f,groundLayer))
+        {
+          return true;
+        }    else
+        {
+          return false;
+        }
+    }
+    IEnumerator Falling()
+    {
+      float elapsed = 0;
+      float duration = 0.2f;
+      while(elapsed < duration)
+      {
+        elapsed = Mathf.Min(duration, elapsed + Time.deltaTime);
+        yield return new WaitForEndOfFrame();
+      }
+      GameManager.instance.gameState = GameManager.GameState.falling;
     }
 
 }

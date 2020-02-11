@@ -10,9 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7831041365271220970}
   - component: {fileID: 7831041365271220973}
-  - component: {fileID: 7831041365271220972}
-  - component: {fileID: 7831041365271220975}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -52,36 +50,13 @@ MonoBehaviour:
   currentPos: 0
   myRb: {fileID: 7831041365672528887}
   resetPlayer: 0
---- !u!136 &7831041365271220972
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7831041365271220971}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  m_Radius: 0.58392143
-  m_Height: 2.0622811
-  m_Direction: 1
-  m_Center: {x: 0, y: 1.0904286, z: -0.024241447}
---- !u!54 &7831041365271220975
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7831041365271220971}
-  serializedVersion: 2
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  inst: 0
+  startMaterial: {fileID: 2100000, guid: ab574265ec61e46d1a3404d0caef5a23, type: 2}
+  crashParticle: {fileID: 8109124333031060853, guid: fc2fa89d5f685435595ffbd10d9339dd,
+    type: 3}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 1024
 --- !u!1 &7831041365672528880
 GameObject:
   m_ObjectHideFlags: 0
@@ -95,8 +70,8 @@ GameObject:
   - component: {fileID: 7831041365672528885}
   - component: {fileID: 7831041365672528882}
   - component: {fileID: 7831041365672528887}
-  m_Layer: 0
-  m_Name: Capsule
+  m_Layer: 9
+  m_Name: CharacterModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -188,8 +163,8 @@ Rigidbody:
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 0
-  m_IsKinematic: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
@@ -202,7 +177,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7831041366646200784}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Direction
   m_TagString: Untagged
   m_Icon: {fileID: 0}

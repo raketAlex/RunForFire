@@ -6,6 +6,7 @@ public class EnemyScript : MonoBehaviour
 {
     public List<Vector3> pathNodes = new List<Vector3>();
     public int posCount;
+    public Rigidbody enemyRb;
     public float radius = 1;
     public float moveSpeed = 6f;
     public enum EnemyType

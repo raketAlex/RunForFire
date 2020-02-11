@@ -9,6 +9,8 @@ public class GameManager : MonoBehaviour
     {
         drawing,
         running,
+        falling,
+        camZoom,
         gameOver, 
         editPath
     }
